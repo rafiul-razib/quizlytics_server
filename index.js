@@ -61,6 +61,11 @@ async function run() {
       res.send(result);
     })
 
+    app.get("/allCustomQuiz", async(req, res)=>{
+      const result = await manualQuizCollection.find().toArray();
+      res.send(result)
+    })
+
     app.get("/getCustomQuizByKey", async(req, res)=>{
       const key = req.query.qKey;
       const query = {
