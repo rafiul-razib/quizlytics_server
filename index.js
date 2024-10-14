@@ -76,6 +76,15 @@ async function run() {
       res.send(result)
     })
 
+    app.delete("/deleteCustomQuiz", async(req, res)=>{
+      const key = req.query.qKey;
+      const query = {
+        quizStartKey: key
+      }
+      const result = await manualQuizCollection.deleteOne(query);
+      res.send(result)
+    })
+
     app.post("/feedback", async(req, res)=>{
       const feedback = req.body;
       const result = await feedbackCollection.insertOne(feedback);
