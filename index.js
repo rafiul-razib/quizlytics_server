@@ -17,7 +17,7 @@ app.use(express.json());
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const uri = `${process.env.URI}`
 
@@ -42,18 +42,36 @@ async function run() {
     const manualQuizCollection = database.collection("manualQuiz");
     const feedbackCollection = database.collection("feedback")
 
+    // Custom Quiz History
     app.post("/saveHistory", async(req, res)=>{
         const userHistory = req.body;
         const result = await userHistoryCollection.insertOne(userHistory);
         res.send(result)
     })
 
-    app.get("/userHistory", async(req, res)=>{
-      const user = req.query?.email;
-      const result = await userHistoryCollection.find()
+
+    app.get("/historyByKey", async(req, res)=>{
+      const key = req.query.qKey;
+      const user = req.query.email
+      const query = {
+        quizStartKey: key,
+        userEmail: user
+      }
+      const result = await userHistoryCollection.find(query).toArray();
+      res.send(result)
     })
 
-    // Musa vai api
+    app.get("/userHistory", async(req, res)=>{
+      const user = req.query?.email;
+      const query = {
+        userEmail : user
+      }
+      console.log(user);
+      const result = await userHistoryCollection.find(query).toArray();
+      res.send(result)
+    })
+
+    // Custom Quiz
     app.post("/saveManualQuiz", async(req, res)=>{
       const quizSet = req.body;
       console.log(quizSet);
@@ -71,7 +89,6 @@ async function run() {
       const query = {
         quizStartKey: key
       }
-      // console.log(query);
       const result = await manualQuizCollection.find(query).toArray();
       res.send(result)
     })
@@ -85,6 +102,7 @@ async function run() {
       res.send(result)
     })
 
+    // Feedback
     app.post("/feedback", async(req, res)=>{
       const feedback = req.body;
       const result = await feedbackCollection.insertOne(feedback);
