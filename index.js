@@ -11,6 +11,7 @@ app.use(cors({
   origin: [
     "http://localhost:3000",
     "https://quizlytics.vercel.app",
+    "https://quizlytics-client-nine.vercel.app",
   ],
 }));
 app.use(express.json());
