@@ -404,18 +404,37 @@ The output should be only the JSON array without any additional commentary or he
 
  
   
-  function safeJsonParse(str) {
-      try {
-        return JSON.parse(str);
-      } catch {
-        // 🔥 Fix unescaped quotes inside values
-        const fixed = str.replace(
-          /"question":\s*"([^"]*?)"/g,
-          (_, q) => `"question": "${q.replace(/"/g, '\\"')}"`
+function safeJsonParse(str) {
+  try {
+    return JSON.parse(str);
+  } catch (err) {
+    try {
+      let fixed = str
+        // remove JS-style comments
+        .replace(/\/\/.*$/gm, "")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+
+        // remove trailing commas in objects & arrays
+        .replace(/,\s*([}\]])/g, "$1")
+
+        // replace smart quotes with normal quotes
+        .replace(/[“”]/g, '"')
+        .replace(/[‘’]/g, "'")
+
+        // escape unescaped quotes inside values
+        .replace(
+          /:\s*"([^"]*?)"/g,
+          (_, v) => `: "${v.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`
         );
-        return JSON.parse(fixed);
-      }
+
+      return JSON.parse(fixed);
+    } catch (finalErr) {
+      console.error("❌ Still invalid JSON:", finalErr.message);
+      return null; // fail safely
+    }
+  }
 }
+
 
     const cleanedText = text
       .replace(/```json|```/g, "")
@@ -451,18 +470,37 @@ The output should be only the JSON array without any additional commentary or he
 
  
   
-  function safeJsonParse(str) {
-      try {
-        return JSON.parse(str);
-      } catch {
-        // 🔥 Fix unescaped quotes inside values
-        const fixed = str.replace(
-          /"question":\s*"([^"]*?)"/g,
-          (_, q) => `"question": "${q.replace(/"/g, '\\"')}"`
+function safeJsonParse(str) {
+  try {
+    return JSON.parse(str);
+  } catch (err) {
+    try {
+      let fixed = str
+        // remove JS-style comments
+        .replace(/\/\/.*$/gm, "")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+
+        // remove trailing commas in objects & arrays
+        .replace(/,\s*([}\]])/g, "$1")
+
+        // replace smart quotes with normal quotes
+        .replace(/[“”]/g, '"')
+        .replace(/[‘’]/g, "'")
+
+        // escape unescaped quotes inside values
+        .replace(
+          /:\s*"([^"]*?)"/g,
+          (_, v) => `: "${v.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`
         );
-        return JSON.parse(fixed);
-      }
+
+      return JSON.parse(fixed);
+    } catch (finalErr) {
+      console.error("❌ Still invalid JSON:", finalErr.message);
+      return null; // fail safely
+    }
+  }
 }
+
 
     const cleanedText = text
       .replace(/```json|```/g, "")
